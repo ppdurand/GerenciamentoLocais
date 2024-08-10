@@ -5,6 +5,8 @@ import edu.durand.GerenciamentoLocais.application.dto.CreateLocalDTO;
 import edu.durand.GerenciamentoLocais.domain.model.Address;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
+import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
+import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFound;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLOutput;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,9 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
     public void createLocation(CreateLocalDTO request) throws IOException {
-        //Consultando enndereço via CEP
+        if((request.cep()).isBlank() || (request.cep()).isEmpty()){
+            throw new CepIsMissingException();
+        }
 
         Address address = this.cepConsult(request.cep());
         address.setNumero(request.number());
@@ -57,7 +59,7 @@ public class LocationService {
 
             return ResponseEntity.ok().body(existingLocation);
         } else {
-            return ResponseEntity.badRequest().body(optional.get());
+            throw new LocationNotFound();
         }
     }
     public void deleteLocation(long id) {
@@ -65,7 +67,7 @@ public class LocationService {
         if(optional.isPresent()){
             locationRepository.deleteById(id);
         } else {
-            System.out.println("Local nao encontrado");
+            throw new LocationNotFound();
         }
     }
     //Consultando enndereço via CEP
