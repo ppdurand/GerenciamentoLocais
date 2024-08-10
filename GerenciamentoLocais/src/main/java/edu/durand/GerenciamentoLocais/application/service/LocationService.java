@@ -47,6 +47,11 @@ public class LocationService {
         allLocations.sort(Comparator.comparing(Location::getCreationDate));
         return ResponseEntity.ok().body(allLocations);
     }
+    public ResponseEntity<List<Location>> getAllByRecentCreation(){
+        List<Location> allLocations = getAll();
+        allLocations.sort(Comparator.comparing(Location::getCreationDate).reversed());
+        return ResponseEntity.ok().body(allLocations);
+    }
     public ResponseEntity<Location> updateLocation(long id, Location location){
         Optional<Location> optional = locationRepository.findById(id);
         if (optional.isPresent()) {

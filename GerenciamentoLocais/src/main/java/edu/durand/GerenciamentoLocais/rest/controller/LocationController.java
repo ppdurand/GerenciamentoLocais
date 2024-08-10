@@ -26,6 +26,10 @@ public class LocationController {
     public ResponseEntity<List<Location>> getAllByCreationDate(){
         return locationService.getAllByCreationOrder();
     }
+    @GetMapping("/recents")
+    public ResponseEntity<List<Location>> getAllByRecentCreation(){
+        return locationService.getAllByRecentCreation();
+    }
     @PutMapping("/update/{id}")
     public ResponseEntity<Location> updateLocation(@PathVariable("id") long id, Location location){
         return locationService.updateLocation(id, location);
