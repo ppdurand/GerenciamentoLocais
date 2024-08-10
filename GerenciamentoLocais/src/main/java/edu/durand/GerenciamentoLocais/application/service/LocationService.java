@@ -1,10 +1,20 @@
 package edu.durand.GerenciamentoLocais.application.service;
 
+import com.google.gson.Gson;
+import edu.durand.GerenciamentoLocais.application.dto.CreateLocalDTO;
+import edu.durand.GerenciamentoLocais.domain.model.Address;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -17,8 +27,14 @@ public class LocationService {
     public LocationService(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
-    public void createLocation(Location request){
-        Location location = new Location(request.getName(), request.getAddress());
+    public void createLocation(CreateLocalDTO request) throws IOException {
+        //Consultando enndereço via CEP
+
+        Address address = this.cepConsult(request.cep());
+        address.setNumero(request.number());
+        address.setComplemento(request.complement());
+
+        Location location = new Location(request.name(), address);
         locationRepository.save(location);
     }
     public List<Location> getAll(){
@@ -51,5 +67,22 @@ public class LocationService {
         } else {
             System.out.println("Local nao encontrado");
         }
+    }
+    //Consultando enndereço via CEP
+    public Address cepConsult(String cep) throws IOException {
+        URL url = new URL("https://viacep.com.br/ws/"+ cep +"/json/");
+
+        URLConnection connection = url.openConnection();
+        InputStream inputStream = connection.getInputStream();
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+
+        String responseCep = "";
+        StringBuilder jsonCep = new StringBuilder();
+
+        while((responseCep = buffer.readLine()) != null){
+            jsonCep.append(responseCep);
+        }
+
+        return new Gson().fromJson(jsonCep.toString(), Address.class);
     }
 }
