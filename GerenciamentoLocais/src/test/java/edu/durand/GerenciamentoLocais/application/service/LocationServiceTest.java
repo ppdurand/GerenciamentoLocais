@@ -1,5 +1,6 @@
 package edu.durand.GerenciamentoLocais.application.service;
 
+import edu.durand.GerenciamentoLocais.application.dto.CreateLocalDTO;
 import edu.durand.GerenciamentoLocais.domain.model.Address;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -32,17 +34,22 @@ class LocationServiceTest {
 
     @Test
     @DisplayName("Should create location sucessfully when everything is OK")
-    void createLocationCase1() {
+    void createLocationCase1() throws IOException {
         locationRepository.deleteAll();
-        Address address = new Address("000000-001", "Ceará", "Fortaleza",
-                "Benfica" , "1", "25", "B");
-        Location location = new Location("Lugar hipotético", address);
-        this.createLocation(location);
+        CreateLocalDTO location = new CreateLocalDTO("IFCE", "60040531", "2081", "");
+
+        this.locationService.createLocation(location);
 
         List<Location> result = this.locationService.getAll();
 
         assertThat(result.isEmpty()).isFalse();
     }
+//    @Test
+//    @DisplayName("Should not create location if CEP is missing")
+//    void createLocationCase2(){
+//        locationRepository.deleteAll();
+//        CreateLocalDTO location = new CreateLocalDTO("IFCE", "")
+//    }
 
     @Test
     @DisplayName("Should get all locations in order of creation")
@@ -59,7 +66,7 @@ class LocationServiceTest {
         location2.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 00));
         this.locationRepository.save(location2);
 
-        ResponseEntity<List<Location>> allLocations = this.getAllByCreationOrder();
+        ResponseEntity<List<Location>> allLocations = this.locationService.getAllByCreationOrder();
 
         assertThat(allLocations.getBody()).hasSize(2);
         assertThat(allLocations.getBody().get(0).getCreationDate()).isBefore(allLocations.getBody().get(1).getCreationDate());
@@ -101,41 +108,9 @@ class LocationServiceTest {
 
         long locationId = location.getId();
 
-        this.deleteLocation(locationId);
+        this.locationService.deleteLocation(locationId);
 
         Optional<Location> result = locationRepository.findById(locationId);
         assertThat(result.isEmpty()).isTrue();
-    }
-
-    public void createLocation(Location location){
-        locationRepository.save(location);
-    }
-    public void deleteLocation(long id) {
-        Optional<Location> optional = locationRepository.findById(id);
-        if(optional.isPresent()){
-            locationRepository.deleteById(id);
-        } else {
-            System.out.println("Local nao encontrado");
-        }
-    }
-    public ResponseEntity<Location> updateLocation(long id, Location location){
-        Optional<Location> optional = locationRepository.findById(id);
-        if (optional.isPresent()) {
-            Location existingLocation = optional.get();
-
-            existingLocation.setName(location.getName());
-            existingLocation.setAddress(location.getAddress());
-
-            locationRepository.save(existingLocation);
-
-            return ResponseEntity.ok().body(existingLocation);
-        } else {
-            return ResponseEntity.badRequest().body(optional.get());
-        }
-    }
-    public ResponseEntity<List<Location>> getAllByCreationOrder(){
-        List<Location> allLocations = this.locationRepository.findAll();
-        allLocations.sort(Comparator.comparing(Location::getCreationDate));
-        return ResponseEntity.ok().body(allLocations);
     }
 }
