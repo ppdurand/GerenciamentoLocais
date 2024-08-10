@@ -2,10 +2,11 @@ package edu.durand.GerenciamentoLocais.application.service;
 
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,11 +17,17 @@ public class LocationService {
     public LocationService(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
-    public void createLocation(Location location){
+    public void createLocation(Location request){
+        Location location = new Location(request.getName(), request.getAddress());
         locationRepository.save(location);
     }
+    public List<Location> getAll(){
+        return locationRepository.findAll();
+    }
     public ResponseEntity<List<Location>> getAllByCreationOrder(){
-        return ResponseEntity.ok().body(locationRepository.findAll());
+        List<Location> allLocations = getAll();
+        allLocations.sort(Comparator.comparing(Location::getCreationDate));
+        return ResponseEntity.ok().body(allLocations);
     }
     public ResponseEntity<Location> updateLocation(long id, Location location){
         Optional<Location> optional = locationRepository.findById(id);
@@ -38,6 +45,11 @@ public class LocationService {
         }
     }
     public void deleteLocation(long id) {
-        locationRepository.deleteById(id);
+        Optional<Location> optional = locationRepository.findById(id);
+        if(optional.isPresent()){
+            locationRepository.deleteById(id);
+        } else {
+            System.out.println("Local nao encontrado");
+        }
     }
 }
