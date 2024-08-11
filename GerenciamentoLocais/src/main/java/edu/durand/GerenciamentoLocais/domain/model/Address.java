@@ -3,6 +3,8 @@ package edu.durand.GerenciamentoLocais.domain.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 
+import java.util.Objects;
+
 @Embeddable
 public class Address {
     private String cep;
@@ -82,4 +84,23 @@ public class Address {
     public void setComplemento(String complemento) {
         this.complemento = complemento;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(cep, address.cep) &&
+                Objects.equals(logradouro, address.logradouro) &&
+                Objects.equals(numero, address.numero) &&
+                Objects.equals(complemento, address.complemento) &&
+                Objects.equals(bairro, address.bairro) &&
+                Objects.equals(localidade, address.localidade) &&
+                Objects.equals(uf, address.uf);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cep, logradouro, numero, complemento, bairro, localidade, uf);
+    }
+
 }
