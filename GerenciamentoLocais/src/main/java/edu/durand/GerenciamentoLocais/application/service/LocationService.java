@@ -27,7 +27,7 @@ public class LocationService {
         this.mapper = mapper;
         this.client = client;
     }
-    public ResponseEntity<Location> createLocation(LocationDTO request) throws IOException {
+    public Location createLocation(LocationDTO request) throws IOException {
         if((request.cep()).isBlank() || (request.cep()).isEmpty()){
             throw new CepIsMissingException();
         }
@@ -38,23 +38,23 @@ public class LocationService {
 
         Location location = new Location(request.name(), address);
         locationRepository.save(location);
-        return ResponseEntity.ok().body(location);
+        return location;
     }
     public List<Location> getAll(){
         return locationRepository.findAll();
     }
-    public ResponseEntity<List<Location>> getAllByCreationOrder(){
+    public List<Location> getAllByCreationOrder(){
         List<Location> allLocations = getAll();
         allLocations.sort(Comparator.comparing(Location::getCreationDate));
 
-        return ResponseEntity.ok().body(allLocations);
+        return allLocations;
     }
-    public ResponseEntity<List<Location>> getAllByRecentCreation(){
+    public List<Location> getAllByRecentCreation(){
         List<Location> allLocations = getAll();
         allLocations.sort(Comparator.comparing(Location::getCreationDate).reversed());
-        return ResponseEntity.ok().body(allLocations);
+        return allLocations;
     }
-    public ResponseEntity<Location> updateLocation(long id, LocationDTO update) throws IOException {
+    public Location updateLocation(long id, LocationDTO update) throws IOException {
         if(update.cep().isBlank() || update.cep().isEmpty()){
             throw new CepIsMissingException();
         }
@@ -66,7 +66,7 @@ public class LocationService {
         Location location = mapper.toModel(update, optional.get());
         this.locationRepository.save(location);
 
-        return ResponseEntity.ok().body(location);
+        return location;
     }
     public void deleteLocation(long id) {
         Optional<Location> optional = locationRepository.findById(id);
