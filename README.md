@@ -1,6 +1,10 @@
 # Gerenciador de Locais
 ## Tópicos da Documentação
 - [Rotas](#Rotas)
+- [API Externa](#API Externa)
+- [Banco de Dados](#Banco de Dados)
+- [Testes Unitários](#Testes Unitários)
+- 
 ## Rotas
 
 ### Retornando Locais 
@@ -60,3 +64,111 @@ A seguinte rota permite o usuário deletar um local
 DELETE /locations/delete/{id}
 ```
 O usuário deve informar na rota um ID do local cadastrado que queira deletar
+
+## API Externa
+Para cadastrar um novo local, o usuário deve informar um CEP. Por meio desse CEP, o sistema saberá o estado, cidade, bairro e logradouro (rua, avenida, etc). Isso só é possível pelo uso da API Via CEP.
+
+A documentação oficial da API pode ser vista [aqui](https://viacep.com.br).
+
+Em comparação com outras API's, essa tem uma implementação simplificada. Por ser pública, não precisará de uma chave pra ser usada e o uso de dependências para o consumo de API's externas (Open Feign Client, por exemplo) não serão necessárias.
+
+Isso facilita o uso do código para outras pessoas que não estiveram envolvidas no desenvolvimeto do projeto, pois a consulta pode ser feita por qualquer um.
+
+### Implementação
+Para fazer a consulta do endereço por CEP, o sistema usa a rota:
+```http
+https://viacep.com.br/ws/{CEP}/json/
+```
+Na regra de negócio, a string enviada como CEP pelo usuário é colocado em {CEP}. Para estabelecer uma conexão com a API, o seguinte código é executado:
+```java
+public Address cepConsult(String cep) throws IOException {
+        URL url = new URL("https://viacep.com.br/ws/"+ cep +"/json/");
+
+        URLConnection connection = url.openConnection();
+        InputStream inputStream = connection.getInputStream();
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+
+        String responseCep = "";
+        StringBuilder jsonCep = new StringBuilder();
+
+        while((responseCep = buffer.readLine()) != null){
+            jsonCep.append(responseCep);
+        }
+
+        return new Gson().fromJson(jsonCep.toString(), Address.class);
+    }
+```
+Esse trecho de código se utiliza de uma dependêcia, a Gson, que facilita a conversão entre objetos Java e JSON.
+```xml
+<dependency>
+  <groupId>com.google.code.gson</groupId>
+  <artifactId>gson</artifactId>
+  <version>2.11.0</version>
+</dependency>
+```
+Como se deve imaginar, para o funcionamento correto do projeto, uma conexão com a internet deve estar estabelecida.
+
+## Banco de Dados
+O banco de dados usado no projeto é o [MySQL](https://www.mysql.com). Para rodar o projeto corretamente, é necessário a instalação desse banco na máquina, e a criação da database "gerenciadordelocais". Também, no arquivo application.properties, é preciso alterar o usuário e a senha pelos os que foram definidos na instalação.
+```properties
+spring.datasource.username=root # Usuário, por padrão vem 'root'
+spring.datasource.password=${DB_PASSWORD} # Senha, que no caso está definida por variável de ambiente
+```
+
+## Testes Unitários
+Para realizar os testes unitários, o banco utilizado foi o banco H2, um banco relacional em memória, muito utilizado para testes rápidos e simples
+```xml
+<dependency>
+		<groupId>com.h2database</groupId>
+		<artifactId>h2</artifactId>
+		<scope>runtime</scope>
+</dependency>
+```
+## Dependências
+Este projeto se utiliza das seguintes dependêcias:
+- Starter Web, facilita a criação de aplicações web.
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+```
+- Starter Data JPA, facilita a integração e o uso do Spring Data JPA em projetos Java.
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+```
+- MySql Connector, permite que aplicações Java se conectem a bancos de dados MySQL.
+```xml
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+H2, permite que aplicações Java se conectem a bancos de dados H2.
+```xml
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+Starter Test, padrão do Spring que fornece uma configuração pré-configurada para testes em aplicações para o framework.
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+Gson, facilita a conversão entre objetos Java e JSON
+```xml
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.11.0</version>
+</dependency>
+```
