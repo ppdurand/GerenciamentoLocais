@@ -1,5 +1,6 @@
 package edu.durand.GerenciamentoLocais.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 
 @Embeddable

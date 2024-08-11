@@ -1,6 +1,6 @@
 package edu.durand.GerenciamentoLocais.rest.controller;
 
-import edu.durand.GerenciamentoLocais.application.dto.CreateLocalDTO;
+import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.application.service.LocationService;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import org.springframework.http.ResponseEntity;
@@ -19,20 +19,24 @@ public class LocationController {
     }
 
     @PostMapping("/new")
-    public void postLocation(@RequestBody CreateLocalDTO request) throws IOException {
+    public void postLocation(@RequestBody LocationDTO request) throws IOException {
         locationService.createLocation(request);
     }
     @GetMapping()
     public ResponseEntity<List<Location>> getAllByCreationDate(){
         return locationService.getAllByCreationOrder();
     }
-    @GetMapping("/recents")
+    @GetMapping("/recent")
     public ResponseEntity<List<Location>> getAllByRecentCreation(){
         return locationService.getAllByRecentCreation();
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<Location> updateLocation(@PathVariable("id") long id, Location location){
-        return locationService.updateLocation(id, location);
+    public ResponseEntity<Location> updateLocation(@PathVariable("id") long id, @RequestBody LocationDTO location){
+        try {
+            return locationService.updateLocation(id, location);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     @DeleteMapping("/delete/{id}")
     public void deleteLocation(@PathVariable("id") long id){

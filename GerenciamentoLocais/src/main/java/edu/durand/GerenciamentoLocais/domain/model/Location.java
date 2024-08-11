@@ -21,6 +21,12 @@ public class Location {
         this.address = address;
         this.creationDate = LocalDateTime.now();
     }
+    public Location(String name, String cep, String number, String complement){
+        this.name = name;
+        this.address.setCep(cep);
+        this.address.setNumero(number);
+        this.address.setComplemento(complement);
+    }
 
     public long getId() {
         return id;
