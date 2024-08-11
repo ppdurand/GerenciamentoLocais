@@ -13,6 +13,7 @@ public class Location {
     @Embedded
     private Address address;
     private LocalDateTime creationDate;
+    private LocalDateTime updateDate;
 
     public Location() {}
 
@@ -20,6 +21,7 @@ public class Location {
         this.name = name;
         this.address = address;
         this.creationDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
     }
     public Location(String name, String cep, String number, String complement){
         this.name = name;
@@ -44,6 +46,10 @@ public class Location {
         return creationDate;
     }
 
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -58,5 +64,9 @@ public class Location {
 
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
     }
 }

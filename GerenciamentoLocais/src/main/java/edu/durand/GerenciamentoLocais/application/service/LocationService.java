@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +65,7 @@ public class LocationService {
             throw new LocationNotFound();
         }
         Location location = mapper.toModel(update, optional.get());
+        location.setUpdateDate(LocalDateTime.now());
         this.locationRepository.save(location);
 
         return location;
