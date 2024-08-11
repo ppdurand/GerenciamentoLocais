@@ -1,7 +1,6 @@
 package edu.durand.GerenciamentoLocais.application.service;
 
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
-import edu.durand.GerenciamentoLocais.domain.model.Address;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
@@ -14,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -55,14 +51,14 @@ class LocationServiceTest {
     }
     @Test
     @DisplayName("Should not create location if CEP is missing")
-    void shouldNotCreateWhenCepIsMissing() throws IOException {
+    void shouldNotCreateWhenCepIsMissing() {
         //Arrange
+        this.locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("IFCE", "", "1", "");
 
         //Act and Assert
-        Exception exception = assertThrows(CepIsMissingException.class, () -> {
-            this.locationService.createLocation(location);
-        });
+        Exception exception = assertThrows(CepIsMissingException.class,
+                () -> this.locationService.createLocation(location));
         assertThat(exception.getMessage()).contains("Informe o CEP");
 
     }
@@ -71,30 +67,31 @@ class LocationServiceTest {
     @DisplayName("Should get all locations in order of creation")
     void shouldGetAllByrOrderOfCreation() throws IOException {
         //Arrange
+        this.locationRepository.deleteAll();
         LocationDTO location1 = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
-        Location entity1 = this.locationService.createLocation(location1).getBody();
+        Location entity1 = this.locationService.createLocation(location1);
 
         if(entity1 == null){
             fail("Primeiro lugar não foi criado com sucesso");
         }
 
-        entity1.setCreationDate(LocalDateTime.of(2024, 8, 9, 20, 00));
+        entity1.setCreationDate(LocalDateTime.of(2024, 8, 9, 20, 0));
 
         LocationDTO location2 = new LocationDTO("Lugar 2", "69911800", "2", "lado par");
-        Location entity2 = this.locationService.createLocation(location1).getBody();
+        Location entity2 = this.locationService.createLocation(location2);
 
         if(entity2 == null){
             fail("Segundo lugar não foi criado com sucesso");
         }
 
-        entity2.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 00));
+        entity2.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 0));
 
         //Act
-        ResponseEntity<List<Location>> allLocations = this.locationService.getAllByCreationOrder();
+        List<Location> allLocations = this.locationService.getAllByCreationOrder();
 
         //Assert
-        assertThat(allLocations.getBody()).hasSize(2);
-        assertThat(allLocations.getBody().get(0).getCreationDate()).isBefore(allLocations.getBody().get(1).getCreationDate());
+        assertThat(allLocations).hasSize(2);
+        assertThat(allLocations.get(0).getCreationDate()).isBefore(allLocations.get(1).getCreationDate());
     }
     @Test
     @DisplayName("Should update location address, but preserve name")
@@ -102,14 +99,14 @@ class LocationServiceTest {
         //Arrange
         locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
-        Location entity = this.locationService.createLocation(location).getBody();
+        Location entity = this.locationService.createLocation(location);
         if(entity == null){
             fail("O lugar não foi criado com sucesso");
         }
 
         //Act
         LocationDTO update = new LocationDTO("IFCE", "60340325", "81", "ao lado do mercado");
-        Location updateEntity = this.locationService.updateLocation(entity.getId(), update).getBody();
+        Location updateEntity = this.locationService.updateLocation(entity.getId(), update);
 
         if(updateEntity == null){
             fail("O lugar não foi atualizado com sucesso");
@@ -123,15 +120,16 @@ class LocationServiceTest {
     @DisplayName("Should update location name, but preserve adress")
     void shouldUpdateLocationNameAndPreserveOtherFields() throws IOException {
         //Arrange
+        this.locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
-        Location entity = this.locationService.createLocation(location).getBody();
+        Location entity = this.locationService.createLocation(location);
         if(entity == null){
             fail("O lugar não foi criado com sucesso");
         }
 
         //Act
         LocationDTO update = new LocationDTO("UFC", "60040531", "2081", "");
-        Location updateEntity = this.locationService.updateLocation(entity.getId(), update).getBody();
+        Location updateEntity = this.locationService.updateLocation(entity.getId(), update);
 
         if(updateEntity == null){
             fail("O lugar não foi atualizado com sucesso");
@@ -142,20 +140,38 @@ class LocationServiceTest {
         assertThat(updateEntity.getAddress()).isEqualTo(entity.getAddress());
     }
     @Test
+    @DisplayName("should update the date when location was updated")
+    void shouldUpdateDateWhenLocationWasUpdated() throws IOException {
+        //Arrange
+        this.locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO("Casa", "60040531", "123", "");
+        Location entity = this.locationService.createLocation(location);
+        entity.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 0));
+
+        //Act
+        LocationDTO update = new LocationDTO("Nova casa", "58059-748",
+                "321", "em frente ao mercado");
+        Location updateEntity = this.locationService.updateLocation(entity.getId(), update);
+
+        //Assert
+        assertThat(updateEntity.getUpdateDate()).isAfter(updateEntity.getCreationDate());
+        assertThat(updateEntity.getUpdateDate()).isNotEqualTo(entity.getUpdateDate());
+
+    }
+    @Test
     @DisplayName("Should delete one location by ID")
     void shouldDeleteLocationById() throws IOException {
         //Arrange
         LocationDTO location = new LocationDTO("Lugar Hipotético", "60040531", "123", "");
-        Location entity = this.locationService.createLocation(location).getBody();
+        Location entity = this.locationService.createLocation(location);
 
         //Act
         long locationId = entity.getId();
         this.locationService.deleteLocation(locationId);
 
         //Assert
-        Exception exception = assertThrows(LocationNotFound.class, () -> {
-            this.locationService.deleteLocation(locationId);
-        });
+        Exception exception = assertThrows(LocationNotFound.class,
+                () -> this.locationService.deleteLocation(locationId));
         assertThat(exception.getMessage()).contains("Local Não Encontrado. Tente um ID existente");
     }
 }
