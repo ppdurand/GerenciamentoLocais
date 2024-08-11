@@ -1,9 +1,9 @@
 # Gerenciador de Locais
 ## Tópicos da Documentação
 - [Rotas](#Rotas)
-- [API Externa](#APIExterna)
-- [Banco de Dados](#BancodeDados)
-- [Testes Unitários](#TestesUnitários)
+- [API Externa](#API-Externa)
+- [Banco de Dados](#Banco-de-Dados)
+- [Testes Unitários](#Testes-Unitários)
 - [Dependências](#Dependências)
 ## Rotas
 
