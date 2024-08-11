@@ -19,8 +19,8 @@ public class LocationController {
     }
 
     @PostMapping("/new")
-    public void postLocation(@RequestBody LocationDTO request) throws IOException {
-        locationService.createLocation(request);
+    public ResponseEntity<Location> postLocation(@RequestBody LocationDTO request) throws IOException {
+        return locationService.createLocation(request);
     }
     @GetMapping()
     public ResponseEntity<List<Location>> getAllByCreationDate(){

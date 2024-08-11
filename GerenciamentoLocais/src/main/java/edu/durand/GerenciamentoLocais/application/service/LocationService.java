@@ -27,7 +27,7 @@ public class LocationService {
         this.mapper = mapper;
         this.client = client;
     }
-    public void createLocation(LocationDTO request) throws IOException {
+    public ResponseEntity<Location> createLocation(LocationDTO request) throws IOException {
         if((request.cep()).isBlank() || (request.cep()).isEmpty()){
             throw new CepIsMissingException();
         }
@@ -38,6 +38,7 @@ public class LocationService {
 
         Location location = new Location(request.name(), address);
         locationRepository.save(location);
+        return ResponseEntity.ok().body(location);
     }
     public List<Location> getAll(){
         return locationRepository.findAll();
