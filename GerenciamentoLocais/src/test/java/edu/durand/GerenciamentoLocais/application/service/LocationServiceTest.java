@@ -3,8 +3,7 @@ package edu.durand.GerenciamentoLocais.application.service;
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
-import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
-import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFoundException;
+import edu.durand.GerenciamentoLocais.rest.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,34 +37,6 @@ class LocationServiceTest {
     }
 
     @Test
-    @DisplayName("Should create location sucessfully when everything is OK")
-    void shouldCreateLocation() throws IOException {
-        locationRepository.deleteAll();
-        LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
-
-        //Act
-        this.locationService.createLocation(location);
-        List<Location> result = this.locationService.getAll();
-
-        assertThat(result.isEmpty()).isFalse();
-    }
-    @Test
-    @DisplayName("Should not create location if CEP is missing")
-    void shouldNotCreateWhenCepIsMissing() {
-        //Arrange
-        this.locationRepository.deleteAll();
-        LocationDTO location = new LocationDTO("IFCE", "", "1", "");
-
-        //Act and Assert
-        Exception exception = assertThrows(CepIsMissingException.class,
-                () -> this.locationService.createLocation(location));
-        assertThat(exception.getMessage()).contains("Informe o CEP");
-
-    }
-    @Test
-    @DisplayName("Should not create location")
-
-    @Test
     @DisplayName("Should get all locations in order of creation")
     void shouldGetAllByrOrderOfCreation() throws IOException {
         //Arrange
@@ -94,6 +65,68 @@ class LocationServiceTest {
         //Assert
         assertThat(allLocations).hasSize(2);
         assertThat(allLocations.get(0).getCreationDate()).isBefore(allLocations.get(1).getCreationDate());
+    }
+    @Test
+    @DisplayName("Should create location sucessfully when everything is OK")
+    void shouldCreateLocation() throws IOException {
+        locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
+
+        //Act
+        this.locationService.createLocation(location);
+        List<Location> result = this.locationService.getAll();
+
+        assertThat(result.isEmpty()).isFalse();
+    }
+    @Test
+    @DisplayName("Should not create location if CEP is blank")
+    void shouldNotCreateWhenCepIsMissing() {
+        //Arrange
+        this.locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO("IFCE", "", "1", "");
+
+        //Act and Assert
+        Exception exception = assertThrows(CepIsMissingException.class,
+                () -> this.locationService.createLocation(location));
+        assertThat(exception.getMessage()).contains("Informe o CEP");
+
+    }
+    @Test
+    @DisplayName("Should not create location if CEP is null")
+    void shouldNotCreatWhenCepIsNull(){
+        //Arrange
+        this.locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO("IFCE", null,"1", "");
+
+        //Act and Assert
+        Exception exception = assertThrows(CepIsNullException.class,
+                ()-> this.locationService.createLocation(location));
+        assertThat(exception.getMessage()).contains("O CEP não pode ser nulo");
+    }
+    @Test
+    @DisplayName("Should not create location when name is blank or less than 3 characters")
+    void shouldNotCreatWhenNameisBlankOr3Characters(){
+        //Arrange
+        this.locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO("", "59022-305","1", "");
+
+        //Act and Assert
+        Exception exception = assertThrows(LocationNameIsInvalidException.class,
+                ()-> this.locationService.createLocation(location));
+        assertThat(exception.getMessage()).contains("O nome do local precisa de no mínimo 3 caracteres");
+    }
+
+    @Test
+    @DisplayName("Should not create location when name is null")
+    void shouldNotCreateLocationWhenNameIsNull(){
+        //Arrange
+        this.locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO(null, "59022-305","1", "");
+
+        //Act and Assert
+        Exception exception = assertThrows(LocationNameIsNullException.class,
+                () -> this.locationService.createLocation(location));
+        assertThat(exception.getMessage()).contains("O nome do local não deve ser nulo");
     }
     @Test
     @DisplayName("Should update location address, but preserve name")
