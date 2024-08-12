@@ -28,12 +28,13 @@ public class LocationController {
 
     @Operation(summary = "Realiza o cadastro de locais", method = "POST")
     @PostMapping("/new")
-    public ResponseEntity<ApiResponse<Location>> postLocation(@RequestBody LocationDTO request)
+    public ResponseEntity<ApiResponse<Location>> postLocation(@RequestBody @Valid LocationDTO request)
             throws IOException {
         var response = locationService.createLocation(request);
         ApiResponse<Location> apiResponse = new ApiResponse<>("Lugar criado com sucesso!", response);
         return ResponseEntity.ok(apiResponse);
     }
+
     @Operation(summary = "Recupera todos os locais em ordem de criação", method = "GET")
     @GetMapping()
     public ResponseEntity<ApiResponse<List<Location>>> getAllByCreationDate(){
@@ -41,6 +42,7 @@ public class LocationController {
         ApiResponse<List<Location>> apiResponse = new ApiResponse<>("Lugares por ordem de criação:", response);
         return ResponseEntity.ok(apiResponse);
     }
+
     @Operation(summary = "Recupera todos os locais por ordem de mais recentes", method = "GET")
     @GetMapping("/recent")
     public ResponseEntity<ApiResponse<List<Location>>> getAllByRecentCreation(){
@@ -48,6 +50,15 @@ public class LocationController {
         ApiResponse<List<Location>> apiResponse = new ApiResponse<>("Lugares criados mais recentemente:", response);
         return ResponseEntity.ok(apiResponse);
     }
+
+    @Operation(summary = "Recupera um único lugar pelo ID")
+    @GetMapping("/search/{id}")
+    public ResponseEntity<ApiResponse<Location>> getById(@PathVariable("id") long id){
+        var response = locationService.getById(id);
+        ApiResponse<Location> apiResponse = new ApiResponse<>("Lugar com ID" + id + " encontrado!", response);
+        return ResponseEntity.ok(apiResponse);
+    }
+
     @Operation(summary = "Atualiza um local pelo ID", method = "PUT")
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<Location>> updateLocation(@PathVariable("id") long id, @RequestBody LocationDTO location) throws IOException {
@@ -55,6 +66,7 @@ public class LocationController {
         ApiResponse<Location> apiResponse = new ApiResponse<>("Lugar atualizado com sucesso", response);
         return ResponseEntity.ok(apiResponse);
     }
+
     @Operation(summary = "Deleta um local pelo ID", method = "DELETE")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse> deleteLocation(@PathVariable("id") long id){

@@ -29,6 +29,7 @@ public class LocationService {
         this.client = client;
         this.validator = validator;
     }
+
     public Location createLocation(LocationDTO request) throws IOException {
         this.validator.validateLocation(request);
 
@@ -40,6 +41,7 @@ public class LocationService {
         locationRepository.save(location);
         return location;
     }
+
     public List<Location> getAll(){
         return locationRepository.findAll();
     }
@@ -49,11 +51,19 @@ public class LocationService {
 
         return allLocations;
     }
+
     public List<Location> getAllByRecentCreation(){
         List<Location> allLocations = getAll();
         allLocations.sort(Comparator.comparing(Location::getCreationDate).reversed());
         return allLocations;
     }
+
+    public Location getById(long id){
+        Optional<Location> optional = this.locationRepository.findById(id);
+        this.validator.validateOptional(optional);
+        return optional.get();
+    }
+
     public Location updateLocation(long id, LocationDTO update) throws IOException {
         this.validator.validateLocation(update);
         Optional<Location> optional = locationRepository.findById(id);
@@ -67,6 +77,7 @@ public class LocationService {
 
         return location;
     }
+
     public void deleteLocation(long id) {
         Optional<Location> optional = locationRepository.findById(id);
         if(optional.isPresent()){

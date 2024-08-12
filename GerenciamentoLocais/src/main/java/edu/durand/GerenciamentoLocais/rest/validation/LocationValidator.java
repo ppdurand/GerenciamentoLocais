@@ -1,11 +1,11 @@
 package edu.durand.GerenciamentoLocais.rest.validation;
 
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
-import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
-import edu.durand.GerenciamentoLocais.rest.exception.CepIsNullException;
-import edu.durand.GerenciamentoLocais.rest.exception.LocationNameIsInvalidException;
-import edu.durand.GerenciamentoLocais.rest.exception.LocationNameIsNullException;
+import edu.durand.GerenciamentoLocais.domain.model.Location;
+import edu.durand.GerenciamentoLocais.rest.exception.*;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 
 @Component
@@ -24,5 +24,9 @@ public class LocationValidator {
             throw new LocationNameIsInvalidException();
         }
     }
-
+    public void validateOptional(Optional<Location> optional){
+        if(optional.isEmpty()){
+            throw new LocationNotFoundException();
+        }
+    }
 }
