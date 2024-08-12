@@ -6,8 +6,7 @@ import edu.durand.GerenciamentoLocais.domain.model.Address;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.infra.client.ViaCepClient;
-import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
-import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFound;
+import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFoundException;
 import edu.durand.GerenciamentoLocais.rest.validation.LocationValidator;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +59,7 @@ public class LocationService {
         Optional<Location> optional = locationRepository.findById(id);
 
         if (optional.isEmpty()) {
-            throw new LocationNotFound();
+            throw new LocationNotFoundException();
         }
         Location location = mapper.toModel(update, optional.get());
         location.setUpdateDate(LocalDateTime.now());
@@ -73,7 +72,7 @@ public class LocationService {
         if(optional.isPresent()){
             locationRepository.deleteById(id);
         } else {
-            throw new LocationNotFound();
+            throw new LocationNotFoundException();
         }
     }
 }

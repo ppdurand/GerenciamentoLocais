@@ -4,7 +4,7 @@ import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
 import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
-import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFound;
+import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,6 +62,8 @@ class LocationServiceTest {
         assertThat(exception.getMessage()).contains("Informe o CEP");
 
     }
+    @Test
+    @DisplayName("Should not create location")
 
     @Test
     @DisplayName("Should get all locations in order of creation")
@@ -170,7 +172,7 @@ class LocationServiceTest {
         this.locationService.deleteLocation(locationId);
 
         //Assert
-        Exception exception = assertThrows(LocationNotFound.class,
+        Exception exception = assertThrows(LocationNotFoundException.class,
                 () -> this.locationService.deleteLocation(locationId));
         assertThat(exception.getMessage()).contains("Local Não Encontrado. Tente um ID existente");
     }
