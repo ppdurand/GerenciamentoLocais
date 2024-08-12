@@ -8,7 +8,7 @@ import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.infra.client.ViaCepClient;
 import edu.durand.GerenciamentoLocais.rest.exception.CepIsMissingException;
 import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFound;
-import org.springframework.http.ResponseEntity;
+import edu.durand.GerenciamentoLocais.rest.validation.LocationValidator;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,16 +22,16 @@ public class LocationService {
     private final LocationRepository locationRepository;
     private final LocationMapper mapper;
     private final ViaCepClient client;
+    private final LocationValidator validator;
 
-    public LocationService(LocationRepository locationRepository, LocationMapper mapper, ViaCepClient client) {
+    public LocationService(LocationRepository locationRepository, LocationMapper mapper, ViaCepClient client, LocationValidator validator) {
         this.locationRepository = locationRepository;
         this.mapper = mapper;
         this.client = client;
+        this.validator = validator;
     }
     public Location createLocation(LocationDTO request) throws IOException {
-        if((request.cep()).isBlank() || (request.cep()).isEmpty()){
-            throw new CepIsMissingException();
-        }
+        this.validator.validateLocation(request);
 
         Address address = client.cepConsult(request.cep());
         address.setNumero(request.number());
@@ -56,9 +56,7 @@ public class LocationService {
         return allLocations;
     }
     public Location updateLocation(long id, LocationDTO update) throws IOException {
-        if(update.cep().isBlank() || update.cep().isEmpty()){
-            throw new CepIsMissingException();
-        }
+        this.validator.validateLocation(update);
         Optional<Location> optional = locationRepository.findById(id);
 
         if (optional.isEmpty()) {
