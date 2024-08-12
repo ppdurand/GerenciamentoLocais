@@ -1,12 +1,20 @@
 # Gerenciador de Locais
 ## Tópicos da Documentação
+- [Como Usar a API](#Como-Usar-a-API)
 - [Rotas](#Rotas)
 - [API Externa](#API-Externa)
 - [Banco de Dados](#Banco-de-Dados)
 - [Testes Unitários](#Testes-Unitários)
 - [Dependências](#Dependências)
-## Rotas
+## Como Usar a API
+Após o clone deste repositório na sua máquina, confira se você possui o banco MySQl. Para informações das configurações do banco, vá para o tópico de [Banco de Dados](#Banco-de-Dados).
 
+Com o Banco configurado, comece a rodar o projeto. Para acessar o Endpoints, você pode utilizar a plataforma de consumo de API de sua preferência, porém, esse projeto tem suporte para Swagger, onde os Endpoints estarão todos listados e de fácil acesso.
+O link para acessar o Swagger durante a aplicação:
+```http
+http://localhost:8080/swagger-ui/index.html
+```
+## Rotas
 ### Retornando Locais 
 #### Por Ordem de Criação
 Essa rota retorna uma lista de todos os locais cadastrados no sistema, ordenados pela data de criação (da mais antiga para a mais recente).
@@ -30,14 +38,14 @@ Para essa rota, um JSON no corpo da requisição é necessário, aqui um exemplo
 ```json
 {
     "name": "Minha Casa",
-    "cep": "60761320",
+    "cep": "60761-320",
     "number": "1",
     "complement": "Lado Impar"    
 }
 ```
 O que digitar nos campos:
 - Nome(name): Nome do local, empresa, estabelecimento ou algo customizável pelo usuário.
-- CEP: Qualquer CEP válido em território brasileiro. Deve ser inserido com apenas números, sem traços.
+- CEP: Qualquer CEP válido em território brasileiro. Pode ser inserido com ou sem traço.
 - Número(number): Número do endereço que o usuário quer cadastrar.
 - Complemento(complement): Caso houver e for necessário, um complemento que facilite o encontro do local.
 
