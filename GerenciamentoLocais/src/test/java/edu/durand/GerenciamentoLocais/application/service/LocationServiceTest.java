@@ -39,7 +39,7 @@ class LocationServiceTest {
     @Test
     @DisplayName("Should get all locations in order of creation")
     void shouldGetAllByrOrderOfCreation() throws IOException {
-        //Arrange
+        //Arrang e
         this.locationRepository.deleteAll();
         LocationDTO location1 = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
         Location entity1 = this.locationService.createLocation(location1);
@@ -65,6 +65,56 @@ class LocationServiceTest {
         //Assert
         assertThat(allLocations).hasSize(2);
         assertThat(allLocations.get(0).getCreationDate()).isBefore(allLocations.get(1).getCreationDate());
+    }
+    @Test
+    @DisplayName("Should get all locations by more recent order")
+    void shouldGetAllByMoreRecentOrder() throws IOException {
+        //Arrang e
+        this.locationRepository.deleteAll();
+        LocationDTO location1 = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
+        Location entity1 = this.locationService.createLocation(location1);
+
+        if(entity1 == null){
+            fail("Primeiro lugar não foi criado com sucesso");
+        }
+
+        entity1.setCreationDate(LocalDateTime.of(2024, 8, 9, 20, 0));
+
+        LocationDTO location2 = new LocationDTO("Lugar 2", "69911800", "2", "lado par");
+        Location entity2 = this.locationService.createLocation(location2);
+
+        if(entity2 == null){
+            fail("Segundo lugar não foi criado com sucesso");
+        }
+
+        entity2.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 0));
+
+        // Act
+        List<Location> allLocations = this.locationService.getAllByRecentCreation();
+
+        //Assert
+        assertThat(allLocations).hasSize(2);
+        assertThat(allLocations.get(0).getCreationDate()).isAfter(allLocations.get(1).getCreationDate());
+
+    }
+    @Test
+    @DisplayName("Should get one location by ID")
+    void shouldGetLocationById() throws IOException {
+        //Arrange
+        this.locationRepository.deleteAll();
+        LocationDTO location = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
+        Location entity = this.locationService.createLocation(location);
+
+        if(entity == null){
+            fail("Primeiro lugar não foi criado com sucesso");
+        }
+
+        //Arrange
+        Location searchLocation = this.locationService.getById(entity.getId());
+
+        //Assert
+        assertThat(searchLocation.getId()).isEqualTo(entity.getId());
+        assertThat(searchLocation.getName()).isEqualTo(entity.getName());
     }
     @Test
     @DisplayName("Should create location sucessfully when everything is OK")
