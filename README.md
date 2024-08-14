@@ -5,7 +5,6 @@
 - [API Externa](#API-Externa)
 - [Banco de Dados](#Banco-de-Dados)
 - [Testes Unitários](#Testes-Unitários)
-- [Dependências](#Dependências)
 ## Como Usar a API
 Após o clone deste repositório na sua máquina, confira se você possui o banco MySQl. Para informações das configurações do banco, vá para o tópico de [Banco de Dados](#Banco-de-Dados).
 
@@ -15,6 +14,37 @@ O link para acessar o Swagger durante a aplicação:
 http://localhost:8080/swagger-ui/index.html
 ```
 ## Rotas
+Obs: As rotas de lugar requerem estar conectados com um Bearer Token, logo, as rotas de autenticação precisam ser acessadas antes.
+## Criando um usuário
+Essa rota registra um novo usuario no banco
+```http
+POST /auth/register
+```
+O Json de entrada deve seguir o seguinte modelo
+```json
+{
+  "username": "PedroDurand",
+  "password": "123",
+  "role": "ADMIN"
+}
+```
+Em "role", 2 valores são aceitos: ADMIN e REGULAR. Algumas rotas não permitem o acesso de um usuário regular.
+
+## Logando com um usuário
+Com o usuario criado, essa rota deve ser acessada
+```http
+POST /auth/register
+```
+Modelo de Json:
+```json
+{
+  "username": "PedroDurand",
+  "password": "123"
+}
+```
+Essa rota retornará um token, que deverá ser colocado em cada requisição para a camada de segurança permitir o acesso. No postman, você deve escolher o tipo de autenticação "Bearer Token".
+
+Observações, todas as rotas
 ### Retornando Locais 
 #### Por Ordem de Criação
 Essa rota retorna uma lista de todos os locais cadastrados no sistema, ordenados pela data de criação (da mais antiga para a mais recente).
@@ -23,12 +53,20 @@ Essa rota retorna uma lista de todos os locais cadastrados no sistema, ordenados
 ```
 Um JSON com todos os locais ordenados será retornado.
 
-#### Pelos Mais Recentes
+#### Pelos Mais Recentes (Apenas Admins)
 Rota que retorna uma lista de todos os locais cadastrados no sistema, ordenados por data de criação mais recente.
 ```http
   GET /locations/recent/
 ```
-Um JSON com todos os locais ordenados será retornado
+Apenas Admins podem acessar essa rota.
+
+### Por ID (Apenas Admins)
+Se o objetivo é apenas retornar um local especifico, existe a rota onde se passa o ID do lugar criado
+```http
+  GET /locations/search/{id}
+```
+Apenas Admins podem acessar essa rota.
+
 ### Criando Local Novo 
 Rota que permite o usuário criar um novo local
 ```http
@@ -132,51 +170,5 @@ Para realizar os testes unitários, o banco utilizado foi o banco H2, um banco r
 		<scope>runtime</scope>
 </dependency>
 ```
-## Dependências
-Este projeto se utiliza das seguintes dependêcias:
-- Starter Web, facilita a criação de aplicações web.
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
-```
-- Starter Data JPA, facilita a integração e o uso do Spring Data JPA em projetos Java.
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-</dependency>
-```
-- MySql Connector, permite que aplicações Java se conectem a bancos de dados MySQL.
-```xml
-<dependency>
-    <groupId>com.mysql</groupId>
-    <artifactId>mysql-connector-j</artifactId>
-    <scope>runtime</scope>
-</dependency>
-```
-H2, permite que aplicações Java se conectem a bancos de dados H2.
-```xml
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <scope>runtime</scope>
-</dependency>
-```
-Starter Test, padrão do Spring que fornece uma configuração pré-configurada para testes em aplicações para o framework.
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-test</artifactId>
-    <scope>test</scope>
-</dependency>
-```
-Gson, facilita a conversão entre objetos Java e JSON
-```xml
-<dependency>
-    <groupId>com.google.code.gson</groupId>
-    <artifactId>gson</artifactId>
-    <version>2.11.0</version>
-</dependency>
-```
+## Camada de Segurança
+Para a camada de segurança, usei o Spring Security e o Token JWT. Ela fica responsavel em criar um usuario e fazer o login do mesmo. Usuários comuns (Regular) terão acesso à todas as rotas que eram requisitos obrigatorios do projeto, já os Admins tem acesso também a rotas que não estavam especificadas.
