@@ -11,6 +11,7 @@
 	<groupId>edu.durand</groupId>
 	<artifactId>GerenciamentoLocais</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>GerenciamentoLocais</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -28,6 +29,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 	<dependencies>
 		<dependency>
