@@ -2,10 +2,11 @@ package edu.durand.GerenciamentoLocais.application.service;
 
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.application.mapper.LocationMapper;
+import edu.durand.GerenciamentoLocais.application.service.contract.LocationService;
 import edu.durand.GerenciamentoLocais.domain.model.Address;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
-import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.infra.client.ViaCepClient;
+import edu.durand.GerenciamentoLocais.infra.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.rest.exception.LocationNotFoundException;
 import edu.durand.GerenciamentoLocais.rest.validation.LocationValidator;
 import org.springframework.stereotype.Service;
@@ -17,19 +18,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class LocationService {
+public class LocationServiceImpl implements LocationService {
     private final LocationRepository locationRepository;
     private final LocationMapper mapper;
     private final ViaCepClient client;
     private final LocationValidator validator;
 
-    public LocationService(LocationRepository locationRepository, LocationMapper mapper, ViaCepClient client, LocationValidator validator) {
+    public LocationServiceImpl(LocationRepository locationRepository, LocationMapper mapper, ViaCepClient client, LocationValidator validator) {
         this.locationRepository = locationRepository;
         this.mapper = mapper;
         this.client = client;
         this.validator = validator;
     }
-
+    @Override
     public Location createLocation(LocationDTO request) throws IOException {
         this.validator.validateLocation(request);
 
@@ -42,6 +43,7 @@ public class LocationService {
         return location;
     }
 
+    @Override
     public List<Location> getAll(){
         return locationRepository.findAll();
     }
@@ -52,18 +54,21 @@ public class LocationService {
         return allLocations;
     }
 
+    @Override
     public List<Location> getAllByRecentCreation(){
         List<Location> allLocations = getAll();
         allLocations.sort(Comparator.comparing(Location::getCreationDate).reversed());
         return allLocations;
     }
 
+    @Override
     public Location getById(long id){
         Optional<Location> optional = this.locationRepository.findById(id);
         this.validator.validateOptional(optional);
         return optional.get();
     }
 
+    @Override
     public Location updateLocation(long id, LocationDTO update) throws IOException {
         this.validator.validateLocation(update);
         Optional<Location> optional = locationRepository.findById(id);
@@ -78,6 +83,7 @@ public class LocationService {
         return location;
     }
 
+    @Override
     public void deleteLocation(long id) {
         Optional<Location> optional = locationRepository.findById(id);
         if(optional.isPresent()){

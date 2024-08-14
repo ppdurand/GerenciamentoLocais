@@ -2,7 +2,7 @@ package edu.durand.GerenciamentoLocais.application.service;
 
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
-import edu.durand.GerenciamentoLocais.domain.repository.LocationRepository;
+import edu.durand.GerenciamentoLocais.domain.contract.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.rest.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,11 +23,11 @@ import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class LocationServiceTest {
+class LocationServiceImplTest {
 
     @Autowired
     @InjectMocks
-    private LocationService locationService;
+    private LocationServiceImpl locationServiceImpl;
     @Mock
     private LocationRepository locationRepository;
 
@@ -42,7 +42,7 @@ class LocationServiceTest {
         //Arrang e
         this.locationRepository.deleteAll();
         LocationDTO location1 = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
-        Location entity1 = this.locationService.createLocation(location1);
+        Location entity1 = this.locationServiceImpl.createLocation(location1);
 
         if(entity1 == null){
             fail("Primeiro lugar não foi criado com sucesso");
@@ -51,7 +51,7 @@ class LocationServiceTest {
         entity1.setCreationDate(LocalDateTime.of(2024, 8, 9, 20, 0));
 
         LocationDTO location2 = new LocationDTO("Lugar 2", "69911800", "2", "lado par");
-        Location entity2 = this.locationService.createLocation(location2);
+        Location entity2 = this.locationServiceImpl.createLocation(location2);
 
         if(entity2 == null){
             fail("Segundo lugar não foi criado com sucesso");
@@ -60,7 +60,7 @@ class LocationServiceTest {
         entity2.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 0));
 
         //Act
-        List<Location> allLocations = this.locationService.getAllByCreationOrder();
+        List<Location> allLocations = this.locationServiceImpl.getAllByCreationOrder();
 
         //Assert
         assertThat(allLocations).hasSize(2);
@@ -72,7 +72,7 @@ class LocationServiceTest {
         //Arrang e
         this.locationRepository.deleteAll();
         LocationDTO location1 = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
-        Location entity1 = this.locationService.createLocation(location1);
+        Location entity1 = this.locationServiceImpl.createLocation(location1);
 
         if(entity1 == null){
             fail("Primeiro lugar não foi criado com sucesso");
@@ -81,7 +81,7 @@ class LocationServiceTest {
         entity1.setCreationDate(LocalDateTime.of(2024, 8, 9, 20, 0));
 
         LocationDTO location2 = new LocationDTO("Lugar 2", "69911800", "2", "lado par");
-        Location entity2 = this.locationService.createLocation(location2);
+        Location entity2 = this.locationServiceImpl.createLocation(location2);
 
         if(entity2 == null){
             fail("Segundo lugar não foi criado com sucesso");
@@ -90,7 +90,7 @@ class LocationServiceTest {
         entity2.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 0));
 
         // Act
-        List<Location> allLocations = this.locationService.getAllByRecentCreation();
+        List<Location> allLocations = this.locationServiceImpl.getAllByRecentCreation();
 
         //Assert
         assertThat(allLocations).hasSize(2);
@@ -103,14 +103,14 @@ class LocationServiceTest {
         //Arrange
         this.locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("Lugar 1", "24120180", "1", "lado impar");
-        Location entity = this.locationService.createLocation(location);
+        Location entity = this.locationServiceImpl.createLocation(location);
 
         if(entity == null){
             fail("Primeiro lugar não foi criado com sucesso");
         }
 
         //Arrange
-        Location searchLocation = this.locationService.getById(entity.getId());
+        Location searchLocation = this.locationServiceImpl.getById(entity.getId());
 
         //Assert
         assertThat(searchLocation.getId()).isEqualTo(entity.getId());
@@ -123,8 +123,8 @@ class LocationServiceTest {
         LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
 
         //Act
-        this.locationService.createLocation(location);
-        List<Location> result = this.locationService.getAll();
+        this.locationServiceImpl.createLocation(location);
+        List<Location> result = this.locationServiceImpl.getAll();
 
         assertThat(result.isEmpty()).isFalse();
     }
@@ -137,7 +137,7 @@ class LocationServiceTest {
 
         //Act and Assert
         Exception exception = assertThrows(CepIsMissingException.class,
-                () -> this.locationService.createLocation(location));
+                () -> this.locationServiceImpl.createLocation(location));
         assertThat(exception.getMessage()).contains("Informe o CEP");
 
     }
@@ -150,7 +150,7 @@ class LocationServiceTest {
 
         //Act and Assert
         Exception exception = assertThrows(CepIsNullException.class,
-                ()-> this.locationService.createLocation(location));
+                ()-> this.locationServiceImpl.createLocation(location));
         assertThat(exception.getMessage()).contains("O CEP não pode ser nulo");
     }
     @Test
@@ -162,7 +162,7 @@ class LocationServiceTest {
 
         //Act and Assert
         Exception exception = assertThrows(LocationNameIsInvalidException.class,
-                ()-> this.locationService.createLocation(location));
+                ()-> this.locationServiceImpl.createLocation(location));
         assertThat(exception.getMessage()).contains("O nome do local precisa de no mínimo 3 caracteres");
     }
 
@@ -175,7 +175,7 @@ class LocationServiceTest {
 
         //Act and Assert
         Exception exception = assertThrows(LocationNameIsNullException.class,
-                () -> this.locationService.createLocation(location));
+                () -> this.locationServiceImpl.createLocation(location));
         assertThat(exception.getMessage()).contains("O nome do local não deve ser nulo");
     }
     @Test
@@ -184,14 +184,14 @@ class LocationServiceTest {
         //Arrange
         locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
-        Location entity = this.locationService.createLocation(location);
+        Location entity = this.locationServiceImpl.createLocation(location);
         if(entity == null){
             fail("O lugar não foi criado com sucesso");
         }
 
         //Act
         LocationDTO update = new LocationDTO("IFCE", "60340325", "81", "ao lado do mercado");
-        Location updateEntity = this.locationService.updateLocation(entity.getId(), update);
+        Location updateEntity = this.locationServiceImpl.updateLocation(entity.getId(), update);
 
         if(updateEntity == null){
             fail("O lugar não foi atualizado com sucesso");
@@ -207,14 +207,14 @@ class LocationServiceTest {
         //Arrange
         this.locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
-        Location entity = this.locationService.createLocation(location);
+        Location entity = this.locationServiceImpl.createLocation(location);
         if(entity == null){
             fail("O lugar não foi criado com sucesso");
         }
 
         //Act
         LocationDTO update = new LocationDTO("UFC", "60040531", "2081", "");
-        Location updateEntity = this.locationService.updateLocation(entity.getId(), update);
+        Location updateEntity = this.locationServiceImpl.updateLocation(entity.getId(), update);
 
         if(updateEntity == null){
             fail("O lugar não foi atualizado com sucesso");
@@ -230,13 +230,13 @@ class LocationServiceTest {
         //Arrange
         this.locationRepository.deleteAll();
         LocationDTO location = new LocationDTO("Casa", "60040531", "123", "");
-        Location entity = this.locationService.createLocation(location);
+        Location entity = this.locationServiceImpl.createLocation(location);
         entity.setCreationDate(LocalDateTime.of(2024, 8, 10, 20, 0));
 
         //Act
         LocationDTO update = new LocationDTO("Nova casa", "58059-748",
                 "321", "em frente ao mercado");
-        Location updateEntity = this.locationService.updateLocation(entity.getId(), update);
+        Location updateEntity = this.locationServiceImpl.updateLocation(entity.getId(), update);
 
         //Assert
         assertThat(updateEntity.getUpdateDate()).isAfter(updateEntity.getCreationDate());
@@ -248,15 +248,15 @@ class LocationServiceTest {
     void shouldDeleteLocationById() throws IOException {
         //Arrange
         LocationDTO location = new LocationDTO("Lugar Hipotético", "60040531", "123", "");
-        Location entity = this.locationService.createLocation(location);
+        Location entity = this.locationServiceImpl.createLocation(location);
 
         //Act
         long locationId = entity.getId();
-        this.locationService.deleteLocation(locationId);
+        this.locationServiceImpl.deleteLocation(locationId);
 
         //Assert
         Exception exception = assertThrows(LocationNotFoundException.class,
-                () -> this.locationService.deleteLocation(locationId));
+                () -> this.locationServiceImpl.deleteLocation(locationId));
         assertThat(exception.getMessage()).contains("Local Não Encontrado. Tente um ID existente");
     }
 }
