@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  mysql-db:
+    container_name: mysql
+    image: mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysqlPW
+      - MYSQL_DATABASE=gerenciadordelocais
+
+  spring-app:
+    container_name: spring
+    image: pedrodurand/gerenciamento-locais:latest
+    ports:
+    - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/gerenciadordelocais
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=mysqlPW
+    depends_on:
+      - mysql-db
