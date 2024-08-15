@@ -3,7 +3,7 @@ package edu.durand.GerenciamentoLocais.rest.controller;
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.application.service.contract.LocationService;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/locations")
-@Tag(name = "Gerenciador de Locais")
 public class LocationController {
     private final LocationService locationService;
 

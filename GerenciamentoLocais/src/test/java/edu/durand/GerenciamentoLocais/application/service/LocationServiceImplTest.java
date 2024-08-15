@@ -2,7 +2,7 @@ package edu.durand.GerenciamentoLocais.application.service;
 
 import edu.durand.GerenciamentoLocais.application.dto.LocationDTO;
 import edu.durand.GerenciamentoLocais.domain.model.Location;
-import edu.durand.GerenciamentoLocais.domain.contract.repository.LocationRepository;
+import edu.durand.GerenciamentoLocais.infra.repository.LocationRepository;
 import edu.durand.GerenciamentoLocais.rest.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -120,7 +120,7 @@ class LocationServiceImplTest {
     @DisplayName("Should create location sucessfully when everything is OK")
     void shouldCreateLocation() throws IOException {
         locationRepository.deleteAll();
-        LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "");
+        LocationDTO location = new LocationDTO("IFCE", "60040531", "2081", "lado impar");
 
         //Act
         this.locationServiceImpl.createLocation(location);
