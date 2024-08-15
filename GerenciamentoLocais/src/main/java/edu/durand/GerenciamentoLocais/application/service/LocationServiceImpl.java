@@ -32,9 +32,10 @@ public class LocationServiceImpl implements LocationService {
     }
     @Override
     public Location createLocation(LocationDTO request) throws IOException {
+        //Classe que valida nossa request
         this.validator.validateLocation(request);
 
-        Address address = client.cepConsult(request.cep());
+        Address address = client.cepConsult(request.cep()); //chamando a api
         address.setNumero(request.number());
         address.setComplemento(request.complement());
 

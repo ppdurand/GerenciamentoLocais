@@ -38,6 +38,8 @@ class LocationServiceImplTest {
 
     @Test
     @DisplayName("Should get all locations in order of creation")
+    //Esse teste em específico, funciona normalmente
+        // mas, quando testa todos testes de uma vez, ele falha por algum motibo
     void shouldGetAllByrOrderOfCreation() throws IOException {
         //Arrang e
         this.locationRepository.deleteAll();

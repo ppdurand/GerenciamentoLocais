@@ -14,6 +14,7 @@ import java.net.URLConnection;
 @Component
 public class ViaCepClient {
     //Consultando enndereço via CEP
+    //Faz a conexao com a URL
     public Address cepConsult(String cep) throws IOException {
         URL url = new URL("https://viacep.com.br/ws/"+ cep +"/json/");
 
