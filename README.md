@@ -6,6 +6,16 @@
 - [Banco de Dados](#Banco-de-Dados)
 - [Testes Unitários](#Testes-Unitários)
 ## Como Usar a API
+### Usando o Docker
+Para usar essa API com o Docker, rode o comando abaixo na raiz do projeto:
+```terminal
+docker-compose up -d
+```
+Agora, para acessar todos os Endpoints, basta colocar antes das rotas de cada um essa porta:
+```http
+http://localhost:8080
+```
+### Clonando o projeto inteiro
 Após o clone deste repositório na sua máquina, confira se você possui o banco MySQl. Para informações das configurações do banco, vá para o tópico de [Banco de Dados](#Banco-de-Dados).
 
 Com o Banco configurado, comece a rodar o projeto. Para acessar o Endpoints, você pode utilizar a plataforma de consumo de API de sua preferência, porém, esse projeto tem suporte para Swagger, onde os Endpoints estarão todos listados e de fácil acesso.
